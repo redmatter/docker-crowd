@@ -3,7 +3,7 @@ FROM java:7
 MAINTAINER Dino.Korah@redmatter.com
 
 ENV TZ="Europe/London" \
-    CROWD_VERSION="2.8.3" \
+    CROWD_VERSION="2.8.4" \
     CROWD_HOME="/var/atlassian/application-data/crowd" \
     CROWD_INSTALL_DIR="/opt/atlassian/crowd" \
     # unprivileged users used to run the app
