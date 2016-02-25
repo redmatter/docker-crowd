@@ -9,4 +9,4 @@ stop_catalina() {
 
 trap 'stop_catalina' SIGTERM
 
-exec ${catalina.sh} run
+exec ${catalina_sh} run

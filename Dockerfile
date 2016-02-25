@@ -12,7 +12,7 @@ ENV TZ="Europe/London" \
 
 ADD https://www.atlassian.com/software/crowd/downloads/binary/atlassian-crowd-${CROWD_VERSION}.tar.gz /tmp/files.tar.gz
 #COPY atlassian-crowd-${CROWD_VERSION}.tar.gz /tmp/files.tar.gz
-COPY entrypoint.sh /
+COPY entrypoint.sh setenv.sh /
 
 RUN ( \
     export DEBIAN_FRONTEND=noninteractive; \
@@ -31,6 +31,7 @@ RUN ( \
 
     mkdir ${CROWD_INSTALL_DIR}/apache-tomcat/lib/native; \
     ln --symbolic "/usr/lib/x86_64-linux-gnu/libtcnative-1.so" "${CROWD_INSTALL_DIR}/apache-tomcat/lib/native/libtcnative-1.so"; \
+    mv setenv.sh ${CROWD_INSTALL_DIR}/apache-tomcat/bin/setenv.sh; \
 
     wget -qO- https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-java-5.1.38.tar.gz | \
         tar -xz -O mysql-connector-java-5.1.38/mysql-connector-java-5.1.38-bin.jar >"${CROWD_INSTALL_DIR}/apache-tomcat/lib/mysql-connector-java-5.1.38-bin.jar"; \

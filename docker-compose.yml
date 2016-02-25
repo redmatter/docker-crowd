@@ -9,7 +9,7 @@ services:
       - crowd-data:/var/atlassian/application-data/crowd
 
 volumes:
-  - crowd-data:
+  crowd-data:
 
 # vim: tabstop=2 shiftwidth=2 expandtab:
 
