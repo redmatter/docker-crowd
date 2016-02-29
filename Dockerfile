@@ -23,7 +23,7 @@ RUN ( \
 
     apt-get update; \
     apt-get -y upgrade; \
-    apt-get install -y --no-install-recommends ${APP_DEPS}; \
+    apt-get install -y --no-install-recommends ${APP_DEPS} ${BUILD_DEPS}; \
 
     mkdir -p ${CROWD_INSTALL_DIR}; \
     tar -C ${CROWD_INSTALL_DIR} --strip-components=1 -xzf /tmp/files.tar.gz; \
