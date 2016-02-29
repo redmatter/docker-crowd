@@ -1,0 +1,30 @@
+diff -U 3 -dHBr atlassian-crowd-2.8.4/apache-tomcat/conf/server.xml atlassian-crowd-2.8.4.mod/apache-tomcat/conf/server.xml
+--- atlassian-crowd-2.8.4/apache-tomcat/conf/server.xml	2016-02-10 06:18:03.000000000 +0000
++++ atlassian-crowd-2.8.4.mod/apache-tomcat/conf/server.xml	2016-02-29 14:15:45.586218237 +0000
+@@ -3,7 +3,25 @@
+ 
+     <Service name="Catalina">
+ 
+-        <Connector acceptCount="100" connectionTimeout="20000" disableUploadTimeout="true" enableLookups="false" maxHttpHeaderSize="8192" maxThreads="150" minSpareThreads="25" port="8095" redirectPort="8443" useBodyEncodingForURI="true" URIEncoding="UTF-8"/>
++        <Connector 
++            acceptCount="100"
++            connectionTimeout="20000"
++            disableUploadTimeout="true"
++            enableLookups="false"
++            maxHttpHeaderSize="8192"
++            
++            maxThreads="150"
++            minSpareThreads="25"
++            
++            port="8095"
++            redirectPort="8443"
++
++            proxyName="crowd.redmatter.com"
++            proxyPort="443"
++            scheme="https"
++            
++            useBodyEncodingForURI="true"
++            URIEncoding="UTF-8" />
+ 
+         <Engine defaultHost="localhost" name="Catalina">
+             <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true"/>

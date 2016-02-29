@@ -12,11 +12,11 @@ ENV TZ="Europe/London" \
 
 ADD https://www.atlassian.com/software/crowd/downloads/binary/atlassian-crowd-${CROWD_VERSION}.tar.gz /tmp/files.tar.gz
 #COPY atlassian-crowd-${CROWD_VERSION}.tar.gz /tmp/files.tar.gz
-COPY entrypoint.sh setenv.sh /
+COPY entrypoint.sh setenv.sh https_proxy_server_xml.patch /
 
 RUN ( \
     export DEBIAN_FRONTEND=noninteractive; \
-    # export BUILD_DEPS=""; \
+    export BUILD_DEPS="patch"; \
     export APP_DEPS="libtcnative-1"; \
 
     set -e -u -x; \
@@ -32,6 +32,8 @@ RUN ( \
     mkdir ${CROWD_INSTALL_DIR}/apache-tomcat/lib/native; \
     ln --symbolic "/usr/lib/x86_64-linux-gnu/libtcnative-1.so" "${CROWD_INSTALL_DIR}/apache-tomcat/lib/native/libtcnative-1.so"; \
     mv setenv.sh ${CROWD_INSTALL_DIR}/apache-tomcat/bin/setenv.sh; \
+	patch -p1 -d ${CROWD_INSTALL_DIR} < /https_proxy_server_xml.patch; \
+	rm /https_proxy_server_xml.patch; \
 
     wget -qO- https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-java-5.1.38.tar.gz | \
         tar -xz -O mysql-connector-java-5.1.38/mysql-connector-java-5.1.38-bin.jar >"${CROWD_INSTALL_DIR}/apache-tomcat/lib/mysql-connector-java-5.1.38-bin.jar"; \
@@ -41,7 +43,7 @@ RUN ( \
     chown -R ${RUN_USER}:${RUN_GROUP} ${CROWD_INSTALL_DIR} ${CROWD_HOME}; \
     chmod -R go-rwx ${CROWD_INSTALL_DIR}/apache-tomcat/logs ${CROWD_INSTALL_DIR}/apache-tomcat/temp ${CROWD_INSTALL_DIR}/apache-tomcat/work; \
 
-    # apt-get remove -y $BUILD_DEPS; \
+    apt-get remove -y $BUILD_DEPS; \
     apt-get clean autoclean; \
     apt-get autoremove --yes; \
     rm -rf /var/lib/{apt,dpkg,cache,log}/; \
