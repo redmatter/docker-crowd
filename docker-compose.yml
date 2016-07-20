@@ -1,13 +1,12 @@
 version: "2"
 services:
   crowd-server:
-    image: redmatter/crowd
+    build: .
     ports:
       # http port
       - "8095:8095"
     volumes:
       - crowd-data:/var/atlassian/application-data/crowd
-    restart: always
 
 volumes:
   crowd-data:

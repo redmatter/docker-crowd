@@ -1,23 +1,25 @@
-FROM java:7
+FROM java:8
 
 MAINTAINER Dino.Korah@redmatter.com
 
 ENV TZ="Europe/London" \
-    CROWD_VERSION="2.8.4" \
     CROWD_HOME="/var/atlassian/application-data/crowd" \
     CROWD_INSTALL_DIR="/opt/atlassian/crowd" \
     # unprivileged users used to run the app
     RUN_USER=daemon \
     RUN_GROUP=daemon
 
-ADD https://www.atlassian.com/software/crowd/downloads/binary/atlassian-crowd-${CROWD_VERSION}.tar.gz /tmp/files.tar.gz
-#COPY atlassian-crowd-${CROWD_VERSION}.tar.gz /tmp/files.tar.gz
 COPY entrypoint.sh setenv.sh https_proxy_server_xml.patch /
 
 RUN ( \
     export DEBIAN_FRONTEND=noninteractive; \
-    export BUILD_DEPS="patch"; \
+    export BUILD_DEPS="patch curl"; \
     export APP_DEPS="libtcnative-1"; \
+
+    CROWD_VERSION=2.8.4; \
+    CROWD_DOWNLOAD_URL=https://www.atlassian.com/software/crowd/downloads/binary/atlassian-crowd-${CROWD_VERSION}.tar.gz; \
+    MYSQL_JDBC_VERSION=5.1.39; \
+    MYSQL_JDBC_DOWNLOAD_URL=https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-java-${MYSQL_JDBC_VERSION}.tar.gz; \
 
     set -e -u -x; \
 
@@ -26,17 +28,18 @@ RUN ( \
     apt-get install -y --no-install-recommends ${APP_DEPS} ${BUILD_DEPS}; \
 
     mkdir -p ${CROWD_INSTALL_DIR}; \
-    tar -C ${CROWD_INSTALL_DIR} --strip-components=1 -xzf /tmp/files.tar.gz; \
+    curl -sSL ${CROWD_DOWNLOAD_URL} | \
+        tar -C ${CROWD_INSTALL_DIR} --strip-components=1 -xz; \
     echo "crowd.home=${CROWD_HOME}" >> ${CROWD_INSTALL_DIR}/crowd-webapp/WEB-INF/classes/crowd-init.properties; \
 
     mkdir ${CROWD_INSTALL_DIR}/apache-tomcat/lib/native; \
     ln --symbolic "/usr/lib/x86_64-linux-gnu/libtcnative-1.so" "${CROWD_INSTALL_DIR}/apache-tomcat/lib/native/libtcnative-1.so"; \
     mv setenv.sh ${CROWD_INSTALL_DIR}/apache-tomcat/bin/setenv.sh; \
-	patch -p1 -d ${CROWD_INSTALL_DIR} < /https_proxy_server_xml.patch; \
-	rm /https_proxy_server_xml.patch; \
+    patch -p1 -d ${CROWD_INSTALL_DIR} < /https_proxy_server_xml.patch; \
+    rm /https_proxy_server_xml.patch; \
 
-    wget -qO- https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-java-5.1.38.tar.gz | \
-        tar -xz -O mysql-connector-java-5.1.38/mysql-connector-java-5.1.38-bin.jar >"${CROWD_INSTALL_DIR}/apache-tomcat/lib/mysql-connector-java-5.1.38-bin.jar"; \
+    wget -qO- ${MYSQL_JDBC_DOWNLOAD_URL} | \
+        tar -xz -O mysql-connector-java-${MYSQL_JDBC_VERSION}/mysql-connector-java-${MYSQL_JDBC_VERSION}-bin.jar >"${CROWD_INSTALL_DIR}/apache-tomcat/lib/mysql-connector-java-${MYSQL_JDBC_VERSION}-bin.jar"; \
 
     mkdir -p ${CROWD_HOME}; \
 
@@ -61,4 +64,3 @@ WORKDIR ${CROWD_INSTALL_DIR}
 # STOPSIGNAL SIGTERM
 
 CMD ["/entrypoint.sh"]
-

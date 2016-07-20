@@ -19,9 +19,9 @@ diff -U 3 -dHBr atlassian-crowd-2.8.4/apache-tomcat/conf/server.xml atlassian-cr
 +            port="8095"
 +            redirectPort="8443"
 +
-+            proxyName="crowd.redmatter.com"
-+            proxyPort="443"
-+            scheme="https"
++            proxyName="${catalinaConnectorProxyName}"
++            proxyPort="${catalinaConnectorProxyPort}"
++            scheme="${catalinaConnectorScheme}"
 +            
 +            useBodyEncodingForURI="true"
 +            URIEncoding="UTF-8" />
